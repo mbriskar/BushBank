@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<nite:stream nite:id="ff.syntax" xmlns:nite="http://nite.sourceforge.net/">
+   <syntax nite:id="ff.syntax.1" tag="clause" status="-1">
+      <nite:child href="ff.text.xml#id(ff.text.2)..id(ff.text.6)"/>
+   </syntax>
+   <syntax nite:id="ff.syntax.2" tag="vp" status="-1">
+      <nite:child href="ff.text.xml#id(ff.text.6)"/>
+   </syntax>
+   <syntax nite:id="ff.syntax.3" tag="k1c1gInS" status="-1">
+      <nite:child href="ff.text.xml#id(ff.text.2)"/>
+   </syntax>
+   <syntax nite:id="ff.syntax.4" tag="yFxPk3c4" status="0">
+      <nite:child href="ff.text.xml#id(ff.text.3)"/>
+   </syntax>
+   <syntax nite:id="ff.syntax.5" tag="k7c7" status="0">
+      <nite:child href="ff.text.xml#id(ff.text.4)..id(ff.text.5)"/>
+   </syntax>
+   <syntax nite:id="ff.syntax.6" tag="clause" status="0">
+      <nite:child href="ff.text.xml#id(ff.text.8)..id(ff.text.12)"/>
+   </syntax>
+   <syntax nite:id="ff.syntax.7" tag="vp" status="0">
+      <nite:child href="ff.text.xml#id(ff.text.10)"/>
+   </syntax>
+   <syntax nite:id="ff.syntax.8" tag="k6eAd1" status="0">
+      <nite:child href="ff.text.xml#id(ff.text.8)"/>
+   </syntax>
+   <syntax nite:id="ff.syntax.9" tag="yFxPk3c4" status="0">
+      <nite:child href="ff.text.xml#id(ff.text.9)"/>
+   </syntax>
+   <syntax nite:id="ff.syntax.10" tag="k1c1gInS" status="0">
+      <nite:child href="ff.text.xml#id(ff.text.11)..id(ff.text.12)"/>
+   </syntax>
+   <syntax nite:id="ff.syntax.11" tag="clause" status="-1">
+      <nite:child href="ff.text.xml#id(ff.text.14)..id(ff.text.16)"/>
+   </syntax>
+   <syntax nite:id="ff.syntax.12" tag="vp" status="-1">
+      <nite:child href="ff.text.xml#id(ff.text.16)"/>
+   </syntax>
+   <syntax nite:id="ff.syntax.13" tag="k7c2" status="0">
+      <nite:child href="ff.text.xml#id(ff.text.14)..id(ff.text.15)"/>
+   </syntax>
+</nite:stream>

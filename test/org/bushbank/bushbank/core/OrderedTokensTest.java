@@ -70,6 +70,8 @@ public class OrderedTokensTest {
         instance.add(t2);
 
         assertNull(instance.getTokenByID("3"));
+        assertNull(instance.getTokenByID(null));
         assertTrue(instance.getTokenByID("2") == t2);
+        assertTrue(instance.getTokenByID("1") == t1);
     }
 }

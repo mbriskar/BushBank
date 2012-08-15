@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<nite:stream nite:id="ff.syntax-annotation" xmlns:nite="http://nite.sourceforge.net/">
+   <sanno nite:id="ff.syntax-annotation.1" status="0" date="11/12/08 13:14" annotator="Hugolin" level="ff">
+      <nite:child href="ff.syntax.xml#id(ff.syntax.7)"/>
+   </sanno>
+   <sanno nite:id="ff.syntax-annotation.2" status="0" date="11/12/08 13:14" annotator="Hugolin" level="ff">
+      <nite:child href="ff.syntax.xml#id(ff.syntax.2)"/>
+   </sanno>
+   <sanno nite:id="ff.syntax-annotation.3" status="0" date="11/12/08 13:14" annotator="Hugolin" level="ff">
+      <nite:child href="ff.syntax.xml#id(ff.syntax.6)"/>
+   </sanno>
+   <sanno nite:id="ff.syntax-annotation.4" status="0" date="11/12/08 13:14" annotator="Hugolin" level="ff">
+      <nite:child href="ff.syntax.xml#id(ff.syntax.13)"/>
+   </sanno>
+   <sanno nite:id="ff.syntax-annotation.5" status="0" date="11/12/08 13:14" annotator="Hugolin" level="ff">
+      <nite:child href="ff.syntax.xml#id(ff.syntax.12)"/>
+   </sanno>
+     
+</nite:stream>

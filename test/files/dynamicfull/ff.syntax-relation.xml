@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<nite:stream nite:id="ff.syntax-relation" xmlns:nite="http://nite.sourceforge.net/">
+   <srelation nite:id="ff.syntax-relation.7" type="verb">
+      <nite:pointer role="in-relation-with"  href="ff.syntax.xml#id(ff.syntax.2)"/>
+      <nite:child href="ff.syntax.xml#id(ff.syntax.4)"/>
+   </srelation>
+   <srelation nite:id="ff.syntax-relation.8" type="noun">
+      <nite:pointer role="in-relation-with"  href="ff.syntax.xml#id(ff.syntax.3)"/>
+      <nite:child href="ff.syntax.xml#id(ff.syntax.5)"/>
+   </srelation>
+   <srelation nite:id="ff.syntax-relation.9" type="verb">
+      <nite:pointer role="in-relation-with"  href="ff.syntax.xml#id(ff.syntax.7)"/>
+      <nite:child href="ff.syntax.xml#id(ff.syntax.9)"/>
+   </srelation>
+   <srelation nite:id="ff.syntax-relation.10" type="abc">
+      <nite:pointer role="in-relation-with"  href="ff.syntax.xml#id(ff.syntax.4)"/>
+      <nite:child href="ff.syntax.xml#id(ff.syntax.1)"/>
+   </srelation>
+   <srelation nite:id="ff.syntax-relation.11" type="abc">
+      <nite:pointer role="in-relation-with"  href="ff.syntax.xml#id(ff.syntax.4)"/>
+      <nite:child href="ff.syntax.xml#id(ff.syntax.2)"/>
+   </srelation>
+   <srelation nite:id="ff.syntax-relation.12" type="abc">
+      <nite:pointer role="in-relation-with"  href="ff.syntax.xml#id(ff.syntax.4)"/>
+      <nite:child href="ff.syntax.xml#id(ff.syntax.3)"/>
+   </srelation>
+</nite:stream>

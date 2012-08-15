@@ -26,6 +26,15 @@ public class Sentence extends OrderedTokens {
             return false;
         }
     }
+    
+    public Phrase getPhraseById(String id) {
+        for (Phrase p : phrases) {
+            if(p.getID().equals(id)) {
+                return p;
+            }
+        }
+        return null;
+    }
 
     public boolean removePhrase(Phrase phrase) { return phrases.remove(phrase); }
     public List<Phrase> getPhrases() { return Collections.unmodifiableList(phrases); }
