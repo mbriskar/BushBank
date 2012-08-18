@@ -1,8 +1,5 @@
 package org.bushbank.bushbank.core;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import org.bushbank.bushbank.nxt.NxtCorpus;
 
 public class Phrase extends OrderedTokens {
@@ -17,6 +14,18 @@ public class Phrase extends OrderedTokens {
 
     private SyntaxRelation parentPhrase;
 
+    // constructor for loading (needed this big one because setValidityStatus would call corpus)
+    public Phrase(NxtCorpus corpus, String id, Sentence sentence, int validityStatus, String tag) {
+        this(id,sentence);
+
+        status = validityStatus;
+        grammarTag = tag;
+        this.corpus = corpus;
+        
+    }
+    
+    
+    
     public Phrase(String id, Sentence sentence) {
         super(id);
 

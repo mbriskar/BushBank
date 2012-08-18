@@ -24,6 +24,7 @@ import net.sourceforge.nite.nom.nomwrite.impl.NOMWriteAttribute;
 import net.sourceforge.nite.nom.nomwrite.impl.NOMWriteCorpus;
 import net.sourceforge.nite.nom.nomwrite.impl.NOMWriteElement;
 import net.sourceforge.nite.nom.nomwrite.impl.NOMWritePointer;
+import org.bushbank.bushbank.core.Annotation;
 import org.bushbank.bushbank.core.Morphology;
 import org.bushbank.bushbank.core.Phrase;
 import org.bushbank.bushbank.core.Sentence;
@@ -67,9 +68,8 @@ public class NxtCorpusLoader {
     }
 
     /**
-     * load sentence and its parts 
-     * -> load all tokens references in sentence and morphology information 
-     * -> load all phrases referenced in sentence
+     * load sentence and its parts -> load all tokens references in sentence and
+     * morphology information -> load all phrases referenced in sentence
      */
     public List<Sentence> getSentences(NxtCorpus corp) {
         List<Sentence> sentences = new ArrayList<Sentence>();
@@ -103,7 +103,7 @@ public class NxtCorpusLoader {
                         for (NOMWriteElement e : syntaxElements) {
                             if (e.getID().equals(em.getID())) {
                                 found = true;
-                                break; 
+                                break;
                             }
                         }
                         if (found == false) {
@@ -115,27 +115,27 @@ public class NxtCorpusLoader {
 
             // Parsing syntactic elements (phrases) from sentence
             for (NOMWriteElement syn : syntaxElements) {
-                Phrase phrase = new Phrase(corp,syn.getID(), sentence);
-
+                int status;
+                String tag = null;
                 // load basic information to syntax element
                 if (syn.getAttribute(NXTVALIDITYSTATUS) != null) {
                     if (syn.getAttribute(NXTVALIDITYSTATUS).getStringValue().equals("-1")) {
-                        phrase.setValidityStatus(ValidityStatus.INCORRECT);
+                        status=ValidityStatus.INCORRECT;
                     } else if (syn.getAttribute(NXTVALIDITYSTATUS).getStringValue().equals("1")) {
-                        phrase.setValidityStatus(ValidityStatus.CORRECT);
+                        status=ValidityStatus.CORRECT;
                     } else {
-                        phrase.setValidityStatus(ValidityStatus.UNKNOWN);
+                        status=ValidityStatus.UNKNOWN;
                     }
-
                     if (syn.getAttribute(NXTGRAMMARTAG) != null) {
-                        phrase.setGrammarTag(syn.getAttribute(NXTGRAMMARTAG).getStringValue());
+                        tag =syn.getAttribute(NXTGRAMMARTAG).getStringValue();
                     }
                 } else {
-                    phrase.setValidityStatus(ValidityStatus.UNKNOWN);
+                    status=ValidityStatus.UNKNOWN;
                 }
-
+                
+                Phrase phrase = new Phrase(corp, syn.getID(), sentence,status,tag); 
                 // load tokens into syntax element
-                for (NOMWriteElement n : (List<NOMWriteElement>) syn.getChildren()) { //TODO: opravit tak, ze dam do sentence metodu hasTokenID()
+                for (NOMWriteElement n : (List<NOMWriteElement>) syn.getChildren()) { 
                     for (int i = 0; i < sentence.getTokens().size(); i++) {
                         if (n.getID().equals(sentence.getTokens().get(i).getID())) {
                             /*
@@ -212,25 +212,13 @@ public class NxtCorpusLoader {
     public List<Sentence> loadSentences(NxtCorpus corp) {
 
         List<Sentence> sentences = getSentences(corp);
-        Map<String, Phrase> phrases = getPhrases(sentences);
+        Map<String, Phrase> phrases = NxtCorpus.getPhrases(sentences);
         addSyntaxRelations(phrases);
 
         return sentences;
     }
 
-    private Map<String, Phrase> getPhrases(List<Sentence> sentences) {
-        Map<String, Phrase> phrases = new HashMap<String, Phrase>();
-
-        for (Sentence s : sentences) {
-            for (Phrase p : s.getPhrases()) {
-                phrases.put(p.getID(), p);
-            }
-        }
-
-        return phrases;
-    }
-
-    void createAndSaveAnnotation(String id,String status) throws NOMException {
+    void createAndSaveAnnotation(String id, String status) throws NOMException {
 
         DateFormat df = new SimpleDateFormat("y/MM/dd HH:mm");
 
@@ -243,10 +231,8 @@ public class NxtCorpusLoader {
 
         sAnno.addToCorpus();
     }
-    
-    
-    
-     public void checkAndSaveRelation(String phraseId, SyntaxRelation relation) {
+
+    public void checkAndSaveRelation(String phraseId, SyntaxRelation relation) {
         NOMElement oldSyntaxRelation = null;
         NOMElement phraseInCorpus = corpus.getElementByID(phraseId);
 
@@ -260,10 +246,14 @@ public class NxtCorpusLoader {
         }
 
         // handle 'not identified yet 
-        if ((relation != null) && (relation.getType() == null)) { relation = null; }
+        if ((relation != null) && (relation.getType() == null)) {
+            relation = null;
+        }
 
         if ((oldSyntaxRelation != null) && (relation == null)) {
-            /** Delete old element in XML file if possible **/
+            /**
+             * Delete old element in XML file if possible *
+             */
             NOMElement syntaxRelationParent = oldSyntaxRelation.getParentInFile();
             try {
                 syntaxRelationParent.deleteChild(oldSyntaxRelation);
@@ -271,9 +261,13 @@ public class NxtCorpusLoader {
                 Logger.getLogger(NxtCorpus.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else if ((oldSyntaxRelation == null) && (relation == null)) {
-            /** There was no element before so no change is needed **/
+            /**
+             * There was no element before so no change is needed *
+             */
         } else if ((oldSyntaxRelation == null) && (relation != null)) {
-            /** Create a new element if possible **/
+            /**
+             * Create a new element if possible *
+             */
             if (relation.getType() != null) {
                 try {
                     NOMWriteElement sRelation = new NOMWriteAnnotation(corpus, "srelation", observation, "");
@@ -286,9 +280,13 @@ public class NxtCorpusLoader {
                 }
             }
         } else {
-            /** update an existing element **/
+            /**
+             * update an existing element *
+             */
             try {
-                /** Test if there was a real change **/
+                /**
+                 * Test if there was a real change *
+                 */
                 if (oldSyntaxRelation.getAttribute("type").getStringValue().equals(relation.getType())) {
                     if (oldSyntaxRelation.getPointerWithRole("in-relation-with") == null) {
                         if (relation.getParentElement() == null) {
@@ -303,7 +301,9 @@ public class NxtCorpusLoader {
                     }
                 }
 
-                /** Change data in corpora **/
+                /**
+                 * Change data in corpora *
+                 */
                 oldSyntaxRelation.setStringAttribute("type", relation.getType());
                 if (oldSyntaxRelation.getPointerWithRole("in-relation-with") != null) {
                     oldSyntaxRelation.removePointer(oldSyntaxRelation.getPointerWithRole("in-relation-with"));
@@ -311,6 +311,82 @@ public class NxtCorpusLoader {
                 if (relation.getParentElement() != null) {
                     oldSyntaxRelation.addPointer(new NOMWritePointer(corpus, "in-relation-with", null, corpus.getElementByID(relation.getParentElement().getID())));
                 }
+            } catch (NOMException ex) {
+                Logger.getLogger(NxtCorpus.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    public List<Annotation> getAnnotations(List<Sentence> sentences) {
+        /*
+         List<NOMWriteElement> lsanno = corpus.getElementsByName("sanno");
+         if (lsanno != null) {
+         for (NOMWriteElement sanno : lsanno) {
+         for (NOMWriteElement n : (List<NOMWriteElement>) sanno.getChildren()) {
+         Annotation a = new Annotation(n.getID());
+
+         if (sanno.getAttribute("status") != null) {
+                        
+         if (sanno.getAttribute("status").getStringValue().equals("-1")) {
+         a.setStatus("-");
+         } else if (sanno.getAttribute("status").getStringValue().equals("0")) {
+         a.setStatus("?");
+         } else if (sanno.getAttribute("status").getStringValue().equals("1")) {
+         a.setStatus("+");
+         } else if (sanno.getAttribute("status").getStringValue().equals("-2")) {
+         a.setStatus("NaN");
+         }
+         }
+
+         if (sanno.getAttribute("annotator") != null) {
+         a.setAuthor(sanno.getAttribute("annotator").getStringValue());
+         }
+         if (sanno.getAttribute("level") != null) {
+         a.setLevel(sanno.getAttribute("level").getStringValue());
+         }
+         if (sanno.getAttribute("date") != null) {
+         a.setDate(sanno.getAttribute("date").getStringValue());
+         }
+
+         if (annos.containsKey(n.getID())) {
+         List<Annotation> la = (List<Annotation>) annos.get(n.getID());
+         la.add(a);
+         } else {
+         List<Annotation> la = new ArrayList<Annotation>();
+         la.add(a);
+         annos.put(n.getID(), la);
+         }
+         }
+         }
+         }
+         */
+        return null;
+    }
+ /*
+  * TEST IT
+  */
+    void savePhrase(Phrase phrase) throws NOMException {
+        if (corpus.getElementByID(phrase.getID()) == null) {
+            System.out.println("NEW " + phrase);
+            NOMWriteElement pElem = new NOMWriteAnnotation(corpus, "syntax", observation, "");
+            NOMWriteElement sElem = (NOMWriteElement) corpus.getElementByID(phrase.getParentSentence().getID());
+
+            pElem.addAttribute(new NOMWriteAttribute("tag", phrase.getGrammarTag()));
+            pElem.addAttribute(new NOMWriteAttribute("status", String.valueOf(phrase.getValidityStatus())));
+            for (Token t : phrase.getTokens()) {
+                pElem.addChild(corpus.getElementByID(t.getID()));
+            }
+
+            pElem.addToCorpus();
+        }
+    }
+    
+    void deletePhrase(Phrase phrase) {
+        NOMElement pElem = corpus.getElementByID(phrase.getID());
+        if (pElem != null) {
+             NOMElement parentElem = pElem.getParentInFile();
+            try {
+                parentElem.deleteChild(pElem);
             } catch (NOMException ex) {
                 Logger.getLogger(NxtCorpus.class.getName()).log(Level.SEVERE, null, ex);
             }

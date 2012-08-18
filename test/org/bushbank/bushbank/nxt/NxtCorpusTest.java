@@ -4,7 +4,9 @@ import org.bushbank.bushbank.core.ValidityStatus;
 import org.bushbank.bushbank.core.Phrase;
 import org.bushbank.bushbank.core.Sentence;
 import java.util.List;
+import net.sourceforge.nite.nom.nomwrite.NOMElement;
 import org.bushbank.bushbank.core.SyntaxRelation;
+import org.bushbank.bushbank.core.Token;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -48,6 +50,49 @@ public class NxtCorpusTest {
         assertEquals(1, sentences.size());
         loadTextOnly();
         assertEquals(1, sentences.size());
+    }
+    
+     @Test
+    public void testGetSentence_Attributes() throws NxtException {
+        loadSimpleFull();
+        //phrases attributes
+        for (Phrase p : sentences.get(0).getPhrases()) {
+            if(p.getID().equals("ff.syntax.1")) {
+//                assertEquals("clause", p.getGrammarTag());
+                assertEquals(5, p.getTokens().size());
+            }
+            if(p.getID().equals("ff.syntax.3")) {
+                assertNull( p.getGrammarTag());
+                assertEquals(1, p.getTokens().size());
+                assertEquals("ff.text.2", p.getTokens().get(0).getID());
+            }
+            
+            if(p.getID().equals("ff.syntax.5")) {
+                assertNull( p.getGrammarTag());
+                assertEquals(2, p.getTokens().size());
+            }
+            
+            if(p.getID().equals("ff.syntax.8")) {
+                assertNull(p.getGrammarTag());
+                assertEquals(1, p.getTokens().size());
+                assertEquals("ff.text.8", p.getTokens().get(0).getID());
+            }
+        }
+         //token attributes
+        for (Token t : sentences.get(0).getTokens()) {
+            if(t.getID().equals("ff.text.2")) {
+                assertEquals("Rok", t.getWordForm());
+               
+            }
+            if(t.getID().equals("ff.text.5")) {
+                assertEquals("rokem", t.getWordForm());
+            }
+            
+            if(t.getID().equals("ff.text.8")) {
+                assertEquals("opět", t.getWordForm());
+            }
+        }
+
     }
 
 
@@ -94,51 +139,46 @@ public class NxtCorpusTest {
         }
     }
     
+
+    
     @Test
-    public void testUpdateValidityStatus() throws NxtException, InterruptedException {
+    public void testSavePhrase() throws NxtException, InterruptedException {
         loadDynamicFull();
-        int statusToSet=1;
+        int phraseNumber = sentences.get(0).getPhrases().size();
         Phrase p0=sentences.get(0).getPhraseById("ff.syntax.1");
-        Phrase p1=sentences.get(0).getPhraseById("ff.syntax.2");
-        Phrase p2=sentences.get(0).getPhraseById("ff.syntax.3");
-
-        //read old values
-        int statusp0=p0.getValidityStatus();
-        int statusp1=p1.getValidityStatus();
-        int statusp2=p2.getValidityStatus();
-        //set new values
-
+        Phrase p1=new Phrase("new_IDDDD", sentences.get(0));
+        p1.add(sentences.get(0).getTokens().get(0));
+        p1.setGrammarTag("Testing");
+        p1.setValidityStatus(0);
         
-        p0.setValidityStatus(statusToSet);
-        p1.setValidityStatus(statusToSet);
-        p2.setValidityStatus(statusToSet);
+        assertFalse(corpus.trySavePhrase(p0));
+        assertTrue(corpus.trySavePhrase(p1));
         corpus.save();
-        //Thread.sleep(5000);
         loadDynamicFull();
-        p0=sentences.get(0).getPhraseById("ff.syntax.1");
-        p1=sentences.get(0).getPhraseById("ff.syntax.2");
-        p2=sentences.get(0).getPhraseById("ff.syntax.3");
+         p1=null;
+        for ( Phrase ph : sentences.get(0).getPhrases() ){
+            
+            if(ph.getID().equals("ff.syntax." + (phraseNumber+1)) ){ 
+                p1=ph;
+            }
+        }
+            
 
-        //check new values
-        assertEquals(statusToSet, p0.getValidityStatus());
-        assertEquals(statusToSet, p1.getValidityStatus());
-        assertEquals(statusToSet, p2.getValidityStatus());
-
-        p0.setValidityStatus(statusp0);
-        p1.setValidityStatus(statusp1);
-        p2.setValidityStatus(statusp2);
+        assertNotNull(p1); 
+        assertEquals("Testing",p1.getGrammarTag());
         
-        corpus.save();
-        //Thread.sleep(5000);
-        loadDynamicFull();
-        p0=sentences.get(0).getPhraseById("ff.syntax.1");
-        p1=sentences.get(0).getPhraseById("ff.syntax.2");
-        p2=sentences.get(0).getPhraseById("ff.syntax.3");
 
-        //check if old values were saved correctly
-        assertEquals(statusp0, p0.getValidityStatus());
-        assertEquals(statusp1, p1.getValidityStatus());
-        assertEquals(statusp2, p2.getValidityStatus()); 
+        corpus.getCorpusLoader().deletePhrase(p1);
+        corpus.save();
+        
+        loadDynamicFull();
+        p1=null;
+        for (Phrase ph : sentences.get(0).getPhrases()) {
+            if("Testing".equals(ph.getGrammarTag()) ) {
+                p1=ph;
+            } 
+        }
+        assertNull(p1);
     }
     
     @Test
@@ -163,7 +203,6 @@ public class NxtCorpusTest {
         p1.setInRelationWith(relationToSet);
         p2.setInRelationWith(relationToSet);
         corpus.save();
-        //Thread.sleep(5000);
         loadDynamicFull();
         p0=sentences.get(0).getPhraseById("ff.syntax.1");
         p1=sentences.get(0).getPhraseById("ff.syntax.2");
@@ -179,7 +218,7 @@ public class NxtCorpusTest {
         p2.setInRelationWith(relationp2);
         
         corpus.save();
-        //Thread.sleep(5000);
+
         loadDynamicFull();
         p0=sentences.get(0).getPhraseById("ff.syntax.1");
         p1=sentences.get(0).getPhraseById("ff.syntax.2");
@@ -190,6 +229,8 @@ public class NxtCorpusTest {
         assertEquals(relationp1.getParentElement().getID(),p1.getInRelationWith().getParentElement().getID());
         assertEquals(relationp2.getParentElement().getID(), p2.getInRelationWith().getParentElement().getID()); 
     }
+
+   
     
         
 }
