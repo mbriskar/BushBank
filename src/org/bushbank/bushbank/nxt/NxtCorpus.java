@@ -1,7 +1,7 @@
 package org.bushbank.bushbank.nxt;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -15,15 +15,16 @@ import org.bushbank.bushbank.core.Phrase;
 import org.bushbank.bushbank.core.Sentence;
 import org.bushbank.bushbank.core.SyntaxRelation;
 
+
 public class NxtCorpus {
 
     private NxtCorpusLoader corpusLoader;
-
-    
-    Map<String, String> validityStatusUpdated; //<id,status>
-    Set<String> relationUpdated;
-    List<Sentence> sentences = null;
-    List<Annotation> annotations = null;
+    // used to set if save new annotations with each edited file.
+    private boolean addAnnotations = true;
+    private Map<String, String> validityStatusUpdated; //<id,status>
+    private Set<String> relationUpdated;
+    private List<Sentence> sentences = null;
+    private List<Annotation> annotations = null;
 
     /**
      * Initialization of corpus, no data are loaded *
@@ -31,6 +32,14 @@ public class NxtCorpus {
     public NxtCorpus(String metadataPath, String observationName) throws NxtException {
         corpusLoader = new NxtCorpusLoader(metadataPath, observationName);
         validityStatusUpdated = new HashMap<String, String>();
+    }
+
+    public boolean isAddAnnotations() {
+        return addAnnotations;
+    }
+
+    public void setAddAnnotations(boolean addAnnotations) {
+        this.addAnnotations = addAnnotations;
     }
 
     /**
@@ -42,13 +51,14 @@ public class NxtCorpus {
         }
         return sentences;
     }
+
     public NxtCorpusLoader getCorpusLoader() {
         return corpusLoader;
     }
 
     /**
-     * Load annotations for sentences.
-     * If sentences were not loaded, they will be loaded before annotations.
+     * Load annotations for sentences. If sentences were not loaded, they will
+     * be loaded before annotations.
      */
     public List<Annotation> getAnnotations() {
         if (annotations == null && sentences == null) {
@@ -65,21 +75,40 @@ public class NxtCorpus {
 
 
     }
-    
+
+    /**
+     * Tries to save a new created Phrase to file.
+     * Return false if there is a Phrase with a given ID or if there 
+     * is a Phrase with the same Tokens.
+     *
+     */
     public boolean trySavePhrase(Phrase phrase) {
         boolean result = false;
-        boolean isNew =true;
+        boolean isNew = true;
         // we need to load it again, as the sentences attribute contain phrases which are not saved
         List<Sentence> loadedSentences = corpusLoader.getSentences(this);
-        
-        if((getPhrases(loadedSentences).containsKey(phrase.getID()))) {
-            isNew=false;
+        Map<String, Phrase> phrases = getPhrases(loadedSentences);
+        List<Phrase> sameSentence = new ArrayList<Phrase>();
+
+        //check if they dont have the same ID
+        if ((phrases.containsKey(phrase.getID()))) {
+            isNew = false;
         }
-        
-        if(isNew && phrase !=null ) {
+        //check if they do not have the same Tokens
+        for (Phrase p : phrases.values()) {
+            if (p.getParentSentence().getID().equals(phrase.getParentSentence().getID())) {
+                //are in same sentence
+                if (p.getTokens().equals(phrase.getTokens())) {
+                    isNew = false;
+                }
+            }
+        }
+
+
+        if (isNew && phrase != null) {
             try {
                 corpusLoader.savePhrase(phrase);
-                result=true;
+                result = true;
             } catch (NOMException ex) {
                 Logger.getLogger(NxtCorpus.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -87,7 +116,10 @@ public class NxtCorpus {
 
         return result;
     }
-    
+
+    /**
+     * Get all the phrases which are in the given sentences.
+     */
     public static Map<String, Phrase> getPhrases(List<Sentence> sentences) {
         Map<String, Phrase> phrases = new HashMap<String, Phrase>();
 
@@ -106,9 +138,11 @@ public class NxtCorpus {
     public void save() {
         try {
             // Creating an annotation for all the objects which has changed the status.
-            for (Iterator<Entry<String, String>> it = validityStatusUpdated.entrySet().iterator(); it.hasNext();) {
-                Entry s = it.next();
-                corpusLoader.createAndSaveAnnotation((String) s.getKey(), (String) s.getValue());
+            if (addAnnotations) {
+                for (Iterator<Entry<String, String>> it = validityStatusUpdated.entrySet().iterator(); it.hasNext();) {
+                    Entry s = it.next();
+                    corpusLoader.createAndSaveAnnotation((String) s.getKey(), (String) s.getValue());
+                }
             }
             validityStatusUpdated.clear();
             corpusLoader.saveChanges();
@@ -133,6 +167,4 @@ public class NxtCorpus {
     public void updateSetInRelationWith(String phraseId, SyntaxRelation parent) {
         corpusLoader.checkAndSaveRelation(phraseId, parent);
     }
-
-
 }

@@ -120,22 +120,24 @@ public class NxtCorpusLoader {
                 // load basic information to syntax element
                 if (syn.getAttribute(NXTVALIDITYSTATUS) != null) {
                     if (syn.getAttribute(NXTVALIDITYSTATUS).getStringValue().equals("-1")) {
-                        status=ValidityStatus.INCORRECT;
+                        status = ValidityStatus.INCORRECT;
                     } else if (syn.getAttribute(NXTVALIDITYSTATUS).getStringValue().equals("1")) {
-                        status=ValidityStatus.CORRECT;
+                        status = ValidityStatus.CORRECT;
                     } else {
-                        status=ValidityStatus.UNKNOWN;
+                        status = ValidityStatus.UNKNOWN;
                     }
-                    if (syn.getAttribute(NXTGRAMMARTAG) != null) {
-                        tag =syn.getAttribute(NXTGRAMMARTAG).getStringValue();
-                    }
-                } else {
-                    status=ValidityStatus.UNKNOWN;
+
+                } else { // if attribute not found 
+                    status = ValidityStatus.UNKNOWN;
                 }
-                
-                Phrase phrase = new Phrase(corp, syn.getID(), sentence,status,tag); 
+
+                if (syn.getAttribute(NXTGRAMMARTAG) != null) {
+                    tag = syn.getAttribute(NXTGRAMMARTAG).getStringValue();
+                }
+
+                Phrase phrase = new Phrase(corp, syn.getID(), sentence, status, tag);
                 // load tokens into syntax element
-                for (NOMWriteElement n : (List<NOMWriteElement>) syn.getChildren()) { 
+                for (NOMWriteElement n : (List<NOMWriteElement>) syn.getChildren()) {
                     for (int i = 0; i < sentence.getTokens().size(); i++) {
                         if (n.getID().equals(sentence.getTokens().get(i).getID())) {
                             /*
@@ -318,53 +320,51 @@ public class NxtCorpusLoader {
     }
 
     public List<Annotation> getAnnotations(List<Sentence> sentences) {
-        /*
-         List<NOMWriteElement> lsanno = corpus.getElementsByName("sanno");
-         if (lsanno != null) {
-         for (NOMWriteElement sanno : lsanno) {
-         for (NOMWriteElement n : (List<NOMWriteElement>) sanno.getChildren()) {
-         Annotation a = new Annotation(n.getID());
+        List<Annotation> result = new ArrayList<Annotation>();
+        List<NOMWriteElement> lsanno = corpus.getElementsByName("sanno");
+        if (lsanno != null) {
+            for (NOMWriteElement sanno : lsanno) {
+                for (NOMWriteElement n : (List<NOMWriteElement>) sanno.getChildren()) {
+                    Annotation a = new Annotation(n.getID());
 
-         if (sanno.getAttribute("status") != null) {
-                        
-         if (sanno.getAttribute("status").getStringValue().equals("-1")) {
-         a.setStatus("-");
-         } else if (sanno.getAttribute("status").getStringValue().equals("0")) {
-         a.setStatus("?");
-         } else if (sanno.getAttribute("status").getStringValue().equals("1")) {
-         a.setStatus("+");
-         } else if (sanno.getAttribute("status").getStringValue().equals("-2")) {
-         a.setStatus("NaN");
-         }
-         }
+                    if (sanno.getAttribute("status") != null) {
 
-         if (sanno.getAttribute("annotator") != null) {
-         a.setAuthor(sanno.getAttribute("annotator").getStringValue());
-         }
-         if (sanno.getAttribute("level") != null) {
-         a.setLevel(sanno.getAttribute("level").getStringValue());
-         }
-         if (sanno.getAttribute("date") != null) {
-         a.setDate(sanno.getAttribute("date").getStringValue());
-         }
+                        if (sanno.getAttribute("status").getStringValue().equals("-1")) {
+                            a.setStatus("-");
+                        } else if (sanno.getAttribute("status").getStringValue().equals("0")) {
+                            a.setStatus("?");
+                        } else if (sanno.getAttribute("status").getStringValue().equals("1")) {
+                            a.setStatus("+");
+                        } else if (sanno.getAttribute("status").getStringValue().equals("-2")) {
+                            a.setStatus("NaN");
+                        }
+                    }
 
-         if (annos.containsKey(n.getID())) {
-         List<Annotation> la = (List<Annotation>) annos.get(n.getID());
-         la.add(a);
-         } else {
-         List<Annotation> la = new ArrayList<Annotation>();
-         la.add(a);
-         annos.put(n.getID(), la);
-         }
-         }
-         }
-         }
-         */
-        return null;
+                    if (sanno.getAttribute("annotator") != null) {
+                        a.setAuthor(sanno.getAttribute("annotator").getStringValue());
+                    }
+                    if (sanno.getAttribute("level") != null) {
+                        a.setLevel(sanno.getAttribute("level").getStringValue());
+                    }
+                    if (sanno.getAttribute("date") != null) {
+                        a.setDate(sanno.getAttribute("date").getStringValue());
+                    }
+                    
+                    Map<String, Phrase> phrases =NxtCorpus.getPhrases(sentences);
+                    Phrase p =phrases.get(n.getID());
+                    a.setContent(p);
+                    result.add(a);
+
+                }
+            }
+        }
+
+        return result;
     }
- /*
-  * TEST IT
-  */
+    /*
+     * TEST IT
+     */
+
     void savePhrase(Phrase phrase) throws NOMException {
         if (corpus.getElementByID(phrase.getID()) == null) {
             System.out.println("NEW " + phrase);
@@ -380,11 +380,11 @@ public class NxtCorpusLoader {
             pElem.addToCorpus();
         }
     }
-    
+
     void deletePhrase(Phrase phrase) {
         NOMElement pElem = corpus.getElementByID(phrase.getID());
         if (pElem != null) {
-             NOMElement parentElem = pElem.getParentInFile();
+            NOMElement parentElem = pElem.getParentInFile();
             try {
                 parentElem.deleteChild(pElem);
             } catch (NOMException ex) {

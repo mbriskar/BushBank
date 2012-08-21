@@ -24,6 +24,31 @@ public class Token {
     public String getID() { return id; }
     public Morphology getMorphology() { return morphology; }
 
+      @Override 
+      public boolean equals(Object bToken) {
+          if ( this == bToken ) {
+              return true;
+          }
+          if ( !(bToken instanceof Token) ) {
+              return false;
+          }
+          Token t2 = (Token) bToken;
+          if(t2.getID().equals(this.getID())) {
+              return true;
+          }
+          else {
+              return false;
+          }
+      }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 59 * hash + (this.id != null ? this.id.hashCode() : 0);
+        hash = 59 * hash + (this.wordForm != null ? this.wordForm.hashCode() : 0);
+        hash = 59 * hash + (this.morphology != null ? this.morphology.hashCode() : 0);
+        return hash;
+    }
     @Override
     public String toString() {
         String res = new String();
