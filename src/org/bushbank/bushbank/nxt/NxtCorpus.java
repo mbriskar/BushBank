@@ -153,7 +153,9 @@ public class NxtCorpus {
     }
 
     /**
-     * Called only from Phrase object, when it changes its status *
+     * Called only from OBJECT, when it changes its status.
+     * Use this method when you want to save status for given object id 
+     * (doesnt need to be Phrase object).
      */
     public void updateValidityStatus(String id, int status) {
         corpusLoader.checkAndSaveValidityStatus(id, status);
@@ -162,9 +164,9 @@ public class NxtCorpus {
     }
 
     /**
-     * Called only from Phrase object, when it changes its relation *
+     * Called only from child object, when it changes its relation. 
      */
-    public void updateSetInRelationWith(String phraseId, SyntaxRelation parent) {
-        corpusLoader.checkAndSaveRelation(phraseId, parent);
+    public void updateSetInRelationWith(String id, SyntaxRelation parent) {
+        corpusLoader.checkAndSaveRelation(id, parent);
     }
 }

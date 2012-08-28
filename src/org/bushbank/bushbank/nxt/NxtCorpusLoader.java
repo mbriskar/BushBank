@@ -164,6 +164,10 @@ public class NxtCorpusLoader {
         return sentences;
     }
 
+    /*
+     * Save validity status for given id. This method can be used on
+     * each object, which has status attribute.
+     */
     public void checkAndSaveValidityStatus(String id, Integer status) {
         NOMElement elem = corpus.getElementByID(id);
 
@@ -179,7 +183,9 @@ public class NxtCorpusLoader {
             }
         }
     }
-
+   /*
+    * Add informations (set the attributes) about syntax relations to given phrases.
+    */
     protected void addSyntaxRelations(Map<String, Phrase> phrases) {
         if (corpus.getElementsByName(NXTSYNTAXRELATION) == null) {
             return;
@@ -219,7 +225,10 @@ public class NxtCorpusLoader {
 
         return sentences;
     }
-
+/*
+ * Create and save annotation for given object ID and new status. This method 
+ * can be called on each object containing status attribute (dont know what is sanno).
+ */
     void createAndSaveAnnotation(String id, String status) throws NOMException {
 
         DateFormat df = new SimpleDateFormat("y/MM/dd HH:mm");
@@ -233,10 +242,12 @@ public class NxtCorpusLoader {
 
         sAnno.addToCorpus();
     }
-
-    public void checkAndSaveRelation(String phraseId, SyntaxRelation relation) {
+/*
+ * Check and save the new relation for given phrase ID.
+ */
+    public void checkAndSaveRelation(String id, SyntaxRelation relation) {
         NOMElement oldSyntaxRelation = null;
-        NOMElement phraseInCorpus = corpus.getElementByID(phraseId);
+        NOMElement phraseInCorpus = corpus.getElementByID(id);
 
         List<NOMElement> parents = phraseInCorpus.getParents();
 
@@ -274,7 +285,7 @@ public class NxtCorpusLoader {
                 try {
                     NOMWriteElement sRelation = new NOMWriteAnnotation(corpus, "srelation", observation, "");
                     sRelation.addAttribute(new NOMWriteAttribute("type", relation.getType()));
-                    sRelation.addChild(corpus.getElementByID(phraseId));
+                    sRelation.addChild(corpus.getElementByID(id));
                     sRelation.addPointer(new NOMWritePointer(corpus, "in-relation-with", null, corpus.getElementByID(relation.getParentElement().getID())));
                     sRelation.addToCorpus();
                 } catch (NOMException ex) {
@@ -318,7 +329,9 @@ public class NxtCorpusLoader {
             }
         }
     }
-
+/*
+ * Checks the annotations for the given sentences.
+ */
     public List<Annotation> getAnnotations(List<Sentence> sentences) {
         List<Annotation> result = new ArrayList<Annotation>();
         List<NOMWriteElement> lsanno = corpus.getElementsByName("sanno");
@@ -349,7 +362,7 @@ public class NxtCorpusLoader {
                     if (sanno.getAttribute("date") != null) {
                         a.setDate(sanno.getAttribute("date").getStringValue());
                     }
-                    
+                    /*Works only if there are only annotations for phrases. */
                     Map<String, Phrase> phrases =NxtCorpus.getPhrases(sentences);
                     Phrase p =phrases.get(n.getID());
                     a.setContent(p);
@@ -361,10 +374,11 @@ public class NxtCorpusLoader {
 
         return result;
     }
+    
+    
     /*
-     * TEST IT
+     * Check and save the given phrase.
      */
-
     void savePhrase(Phrase phrase) throws NOMException {
         if (corpus.getElementByID(phrase.getID()) == null) {
             System.out.println("NEW " + phrase);
@@ -381,8 +395,11 @@ public class NxtCorpusLoader {
         }
     }
 
-    void deletePhrase(Phrase phrase) {
-        NOMElement pElem = corpus.getElementByID(phrase.getID());
+     /*
+     * Delete object with the given ID
+     */
+    void deletePhrase(String id) {
+        NOMElement pElem = corpus.getElementByID(id);
         if (pElem != null) {
             NOMElement parentElem = pElem.getParentInFile();
             try {

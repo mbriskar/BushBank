@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite errors="0" failures="0" hostname="Mato-PC" name="org.bushbank.bushbank.nxt.NxtCorpusTest" tests="5" time="1.479" timestamp="2012-08-18T10:57:05">
+<testsuite errors="0" failures="0" hostname="Mato-PC" name="org.bushbank.bushbank.nxt.NxtCorpusTest" tests="7" time="1.737" timestamp="2012-08-27T22:34:36">
   <properties>
     <property name="libs.jsp-compiler.javadoc" value="" />
     <property name="netbeans.autoupdate.country" value="US" />
@@ -59,7 +59,7 @@
     <property name="copylibs.rebase" value="true" />
     <property name="libs.spring-webmvc3.0.maven-pom" value="" />
     <property name="libs.swing-layout.maven-pom" value="" />
-    <property name="sun.java.command" value="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner org.bushbank.bushbank.nxt.NxtCorpusTest filtertrace=true haltOnError=false haltOnFailure=false showoutput=true outputtoformatters=true logfailedtests=true logtestlistenerevents=true formatter=org.apache.tools.ant.taskdefs.optional.junit.BriefJUnitResultFormatter formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,C:\git\libBushBank\build\test\results\TEST-org.bushbank.bushbank.nxt.NxtCorpusTest.xml crashfile=C:\git\libBushBank\build\junitvmwatcher7663618861364329852.properties propsfile=C:\git\libBushBank\build\junit289074644253814352.properties" />
+    <property name="sun.java.command" value="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner org.bushbank.bushbank.nxt.NxtCorpusTest filtertrace=true haltOnError=false haltOnFailure=false showoutput=true outputtoformatters=true logfailedtests=true logtestlistenerevents=true formatter=org.apache.tools.ant.taskdefs.optional.junit.BriefJUnitResultFormatter formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,C:\git\libBushBank\build\test\results\TEST-org.bushbank.bushbank.nxt.NxtCorpusTest.xml crashfile=C:\git\libBushBank\build\junitvmwatcher2134713634859236250.properties propsfile=C:\git\libBushBank\build\junit4806721959468398970.properties" />
     <property name="build.classes.dir" value="build/classes" />
     <property name="netbeans.accept_license_class" value="org.netbeans.license.AcceptLicense" />
     <property name="jnlp.descriptor" value="application" />
@@ -424,12 +424,14 @@
     <property name="platform.active" value="default_platform" />
     <property name="awt.toolkit" value="sun.awt.windows.WToolkit" />
   </properties>
-  <testcase classname="org.bushbank.bushbank.nxt.NxtCorpusTest" name="testGetSentence_Size" time="0.562" />
-  <testcase classname="org.bushbank.bushbank.nxt.NxtCorpusTest" name="testGetSentence_Count" time="0.16" />
-  <testcase classname="org.bushbank.bushbank.nxt.NxtCorpusTest" name="tesGetSentence_Relations" time="0.065" />
+  <testcase classname="org.bushbank.bushbank.nxt.NxtCorpusTest" name="testGetSentence_Size" time="0.634" />
+  <testcase classname="org.bushbank.bushbank.nxt.NxtCorpusTest" name="testGetSentence_Attributes" time="0.105" />
+  <testcase classname="org.bushbank.bushbank.nxt.NxtCorpusTest" name="testGetSentence_Count" time="0.114" />
+  <testcase classname="org.bushbank.bushbank.nxt.NxtCorpusTest" name="tesGetSentence_Relations" time="0.097" />
+  <testcase classname="org.bushbank.bushbank.nxt.NxtCorpusTest" name="testGetAnnotation" time="0.055" />
   <testcase classname="org.bushbank.bushbank.nxt.NxtCorpusTest" name="testSavePhrase" time="0.264" />
-  <testcase classname="org.bushbank.bushbank.nxt.NxtCorpusTest" name="testUpdateRelation" time="0.186" />
-  <system-out><![CDATA[NEW Rok 
+  <testcase classname="org.bushbank.bushbank.nxt.NxtCorpusTest" name="testUpdateRelation" time="0.243" />
+  <system-out><![CDATA[NEW s 
 Corpus saved succesfully
 Corpus saved succesfully
 Corpus saved succesfully
@@ -456,6 +458,13 @@ Loading data from file: test\files\simplefull\.\ff.syntax.xml
 Loading data from file: test\files\simplefull\.\ff.syntax-annotation.xml
 Loading data from file: test\files\simplefull\.\ff.syntax-relation.xml
 Loading data from file: test\files\simplefull\.\ff.syntax-relation-annotation.xml
+Metadata file: test/files/simplefull/prase.xml
+Loading data from file: test\files\simplefull\.\ff.text.xml
+Loading data from file: test\files\simplefull\.\ff.morphology.xml
+Loading data from file: test\files\simplefull\.\ff.syntax.xml
+Loading data from file: test\files\simplefull\.\ff.syntax-annotation.xml
+Loading data from file: test\files\simplefull\.\ff.syntax-relation.xml
+Loading data from file: test\files\simplefull\.\ff.syntax-relation-annotation.xml
 Metadata file: test/files/textonly/prase.xml
 Loading data from file: test\files\textonly\.\ff.text.xml
 Loading data from file: test\files\textonly\.\ff.morphology.xml
@@ -463,6 +472,13 @@ Loading data from file: test\files\textonly\.\ff.syntax.xml
 Loading data from file: test\files\textonly\.\ff.syntax-annotation.xml
 Loading data from file: test\files\textonly\.\ff.syntax-relation.xml
 Loading data from file: test\files\textonly\.\ff.syntax-relation-annotation.xml
+Metadata file: test/files/simplefull/prase.xml
+Loading data from file: test\files\simplefull\.\ff.text.xml
+Loading data from file: test\files\simplefull\.\ff.morphology.xml
+Loading data from file: test\files\simplefull\.\ff.syntax.xml
+Loading data from file: test\files\simplefull\.\ff.syntax-annotation.xml
+Loading data from file: test\files\simplefull\.\ff.syntax-relation.xml
+Loading data from file: test\files\simplefull\.\ff.syntax-relation-annotation.xml
 Metadata file: test/files/simplefull/prase.xml
 Loading data from file: test\files\simplefull\.\ff.text.xml
 Loading data from file: test\files\simplefull\.\ff.morphology.xml

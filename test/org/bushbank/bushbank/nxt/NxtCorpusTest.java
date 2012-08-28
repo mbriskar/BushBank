@@ -198,7 +198,7 @@ public class NxtCorpusTest {
         assertEquals("Testing", p1.getGrammarTag());
 
 
-        corpus.getCorpusLoader().deletePhrase(p1);
+        corpus.getCorpusLoader().deletePhrase(p1.getID());
         corpus.save();
 
         loadDynamicFull();
