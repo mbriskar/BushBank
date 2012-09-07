@@ -8,20 +8,22 @@ package org.bushbank.bushbank.core;
  *  not have any specific condition for tokens and what they can/cant
  *  contain. 
  */
-public class Token {
-    private String id;
-    private String wordForm;
+public class Token{
+    
     private Morphology morphology;
+    private String id;
+    protected String wordForm;
 
     public Token(String id, String wordForm) {
-        this.id = id;
-        this.wordForm = wordForm;
+        this.id=id;
+        this.wordForm=wordForm;
+
     }
 
     public void setMorphology(Morphology morphology) { this.morphology = morphology; }
 
-    public String getWordForm() { return wordForm; }
-    public String getID() { return id; }
+
+
     public Morphology getMorphology() { return morphology; }
 
       @Override 
@@ -44,7 +46,7 @@ public class Token {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 59 * hash + (this.id != null ? this.id.hashCode() : 0);
+        hash = 59 * hash + (getID() != null ? getID().hashCode() : 0);
         hash = 59 * hash + (this.wordForm != null ? this.wordForm.hashCode() : 0);
         hash = 59 * hash + (this.morphology != null ? this.morphology.hashCode() : 0);
         return hash;
@@ -64,5 +66,21 @@ public class Token {
         }
 
         return res;
+    }
+    
+     public String getID() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getWordForm() {
+        return wordForm;
+    }
+
+    public void setWordForm(String wordForm) {
+        this.wordForm = wordForm;
     }
 }

@@ -1,5 +1,7 @@
 package org.bushbank.bushbank.core;
 
+import java.util.HashSet;
+import java.util.Set;
 import org.bushbank.bushbank.nxt.NxtCorpus;
 
 public class Phrase extends OrderedTokens {
@@ -8,6 +10,7 @@ public class Phrase extends OrderedTokens {
     
     private Sentence parentSentence;
     private String grammarTag;
+    private Set<String> semantic;
     private int status;
     /* @note: is it up-to-date in any case?
      * token numbers according to their position in parent sentence **/
@@ -23,7 +26,22 @@ public class Phrase extends OrderedTokens {
         this.corpus = corpus;
         
     }
+
+    public Set<String> getSemantic() {
+        return semantic;
+    }
+
+    public void setSemantic(Set<String> semantic) {
+        this.semantic = semantic;
+    }
     
+    public void setSemantic(String semantic) {
+        this.semantic= new HashSet<String>();
+        String[] array =semantic.split(",");
+        for(String sem : array) {
+            addSemantic(sem);
+        }
+    }
     
     
     public Phrase(String id, Sentence sentence) {
@@ -38,6 +56,7 @@ public class Phrase extends OrderedTokens {
             throw new RuntimeException();
         }
         this.grammarTag = null;
+        semantic= new HashSet<String>();
         this.status = ValidityStatus.UNKNOWN;
     }
 
@@ -48,7 +67,9 @@ public class Phrase extends OrderedTokens {
     
 
 
-   
+   public void addSemantic(String sem) {
+       semantic.add(sem);
+   }
    public void setCorpus(NxtCorpus corpus) {
         this.corpus = corpus;
     }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<nite:stream nite:id="ff.anaphoras" xmlns:nite="http://nite.sourceforge.net/">
+  <anaphora nite:id="ff.anaphoras.1">
+      <nite:pointer role="in-relation-with"  href="ff.text.xml#id(ff.text.6)"/>
+      <nite:child href="ff.syntax.xml#id(ff.syntax.4)"/>
+   </anaphora>
+
+   
+</nite:stream>

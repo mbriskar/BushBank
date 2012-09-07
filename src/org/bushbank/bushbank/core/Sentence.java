@@ -11,12 +11,28 @@ import java.util.List;
  */
 public class Sentence extends OrderedTokens {
     private List<Phrase> phrases;
+    private List<Anaphora> anaphoras;
 
     public Sentence(String id) {
         super(id);
         phrases = new ArrayList<Phrase>();
+        anaphoras = new ArrayList<Anaphora>();
     }
 
+    public List<Anaphora> getAnaphoras() {
+        return anaphoras;
+    }
+
+    public boolean addAnaphora(Anaphora anaphora) {
+        if (anaphoras.contains(anaphora) == false) {
+            anaphoras.add(anaphora);
+            return true;
+        } else {
+            return false;
+        }
+        
+    }
+    
     public boolean addPhrase(Phrase phrase) {
         /** do not add duplicate phrases **/
         if (phrases.contains(phrase) == false) {

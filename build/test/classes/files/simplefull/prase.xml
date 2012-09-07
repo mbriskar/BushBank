@@ -19,7 +19,12 @@
                     </code>
                 </structural-layer>
                 <time-aligned-layer name="token-layer">
-                    <code name="token" text-content="true"/>
+                    <code name="token" text-content="true">
+                       <attribute name="missing" value-type="enumerated">
+                          <value>true</value>
+                          <value>false</value>
+                       </attribute>
+                    </code>
                 </time-aligned-layer>
             </coding-file>
             <coding-file name="morphology">
@@ -35,6 +40,7 @@
                     <code name="syntax">
                         <attribute name="tag" value-type="string"/>
                         <attribute name="status" value-type="string"/>
+                        <attribute name="semantic" value-type="string"/>
                     </code>
                 </structural-layer>
             </coding-file>
@@ -64,6 +70,14 @@
                         <attribute name="level" value-type="string"/>
                         <attribute name="date" value-type="string"/>
                         <attribute name="status" value-type="string"/>
+                    </code>
+                </structural-layer>
+            </coding-file>
+            <coding-file name="anaphora">
+                <structural-layer name="anaphora-layer" recursive-draws-children-from="syntax-layer">
+                     <code name="anaphora">
+                        <attribute name="type" value-type="string"/>
+                        <pointer number="1" role="in-relation-with" target="token-layer"/>
                     </code>
                 </structural-layer>
             </coding-file>

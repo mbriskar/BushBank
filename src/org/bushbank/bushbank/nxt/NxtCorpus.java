@@ -131,6 +131,18 @@ public class NxtCorpus {
 
         return phrases;
     }
+    
+    public static Sentence getSentenceById(String id, List<Sentence> sentences) {
+        if(id==null) {
+            return null;
+        }
+        for (Sentence sentence : sentences) {
+            if(id.equals(sentence.getID())) {
+                return sentence;
+            }
+        }
+        return null;
+    }
 
     /**
      * Save all the changes to xml files. *

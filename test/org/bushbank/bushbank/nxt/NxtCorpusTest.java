@@ -5,7 +5,9 @@ import org.bushbank.bushbank.core.Phrase;
 import org.bushbank.bushbank.core.Sentence;
 import java.util.List;
 import net.sourceforge.nite.nom.nomwrite.NOMElement;
+import org.bushbank.bushbank.core.Anaphora;
 import org.bushbank.bushbank.core.Annotation;
+import org.bushbank.bushbank.core.MissingToken;
 import org.bushbank.bushbank.core.SyntaxRelation;
 import org.bushbank.bushbank.core.Token;
 import org.junit.AfterClass;
@@ -53,6 +55,9 @@ public class NxtCorpusTest {
         assertEquals(1, sentences.size());
     }
 
+
+    
+    
     @Test
     public void testGetSentence_Attributes() throws NxtException {
         loadSimpleFull();
@@ -61,6 +66,8 @@ public class NxtCorpusTest {
             if (p.getID().equals("ff.syntax.1")) {
                 assertEquals("clause", p.getGrammarTag());
                 assertEquals(5, p.getTokens().size());
+                assertEquals(3,p.getSemantic().size());
+                assertTrue(p.getSemantic().contains("a") && p.getSemantic().contains("b") && p.getSemantic().contains("c"));
             }
             if (p.getID().equals("ff.syntax.3")) {
 
@@ -72,6 +79,8 @@ public class NxtCorpusTest {
             if (p.getID().equals("ff.syntax.5")) {
                 assertEquals("k7c7", p.getGrammarTag());
                 assertEquals(2, p.getTokens().size());
+                assertEquals(1,p.getSemantic().size());
+                assertTrue(p.getSemantic().contains("a"));
             }
 
             if (p.getID().equals("ff.syntax.8")) {
@@ -84,14 +93,22 @@ public class NxtCorpusTest {
         for (Token t : sentences.get(0).getTokens()) {
             if (t.getID().equals("ff.text.2")) {
                 assertEquals("Rok", t.getWordForm());
+                assertEquals(Token.class,t.getClass());
 
             }
             if (t.getID().equals("ff.text.5")) {
                 assertEquals("rokem", t.getWordForm());
+                assertEquals(Token.class,t.getClass());
             }
 
             if (t.getID().equals("ff.text.8")) {
                 assertEquals("opět", t.getWordForm());
+                assertEquals(Token.class,t.getClass());
+            }
+            
+            if (t.getID().equals("ff.text.13")) {
+                assertEquals("co", t.getWordForm());
+                assertEquals(MissingToken.class,t.getClass());
             }
         }
 
@@ -110,6 +127,23 @@ public class NxtCorpusTest {
 
     }
 
+    @Test
+    public void testGetSentence_Annaphoras() throws NxtException  {
+         loadSimpleFull();
+         List<Anaphora> anaphoras =sentences.get(0).getAnaphoras();
+         
+         for(Anaphora anaphora : anaphoras) {
+             if("ff.anaphora.1".equals(anaphora.getId())) {
+                 assertEquals("ff.text.6", anaphora.getToken().getID());
+                 assertEquals("sešel", anaphora.getToken().getWordForm());
+                 
+                 assertEquals("ff.syntax.4", anaphora.getPhrase().getID());
+                 
+             }
+         }
+    }
+    
+    
     @Test
     public void tesGetSentence_Relations() throws NxtException {
         loadSimpleFull();

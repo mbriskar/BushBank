@@ -24,7 +24,9 @@ import net.sourceforge.nite.nom.nomwrite.impl.NOMWriteAttribute;
 import net.sourceforge.nite.nom.nomwrite.impl.NOMWriteCorpus;
 import net.sourceforge.nite.nom.nomwrite.impl.NOMWriteElement;
 import net.sourceforge.nite.nom.nomwrite.impl.NOMWritePointer;
+import org.bushbank.bushbank.core.Anaphora;
 import org.bushbank.bushbank.core.Annotation;
+import org.bushbank.bushbank.core.MissingToken;
 import org.bushbank.bushbank.core.Morphology;
 import org.bushbank.bushbank.core.Phrase;
 import org.bushbank.bushbank.core.Sentence;
@@ -41,8 +43,11 @@ public class NxtCorpusLoader {
     private NOMWriteCorpus corpus;
     private static final String NXTSENTENCE = "s";
     private static final String NXTMORPHOLOGY = "morpho";
+    private static final String NXTANAPHORA = "anaphora";
     private static final String NXTLEMMA = "lemma";
+    private static final String NXTTOKENMISSING = "missing";
     private static final String NXTGRAMMARTAG = "tag";
+    private static final String NXTSEMANTIC = "semantic";
     private static final String NXTSYNTAX = "syntax";
     private static final String NXTVALIDITYSTATUS = "status";
     private static final String NXTSYNTAXRELATION = "srelation";
@@ -81,8 +86,14 @@ public class NxtCorpusLoader {
             Set<NOMWriteElement> syntaxElements = new HashSet<NOMWriteElement>();
 
             for (NOMWriteElement t : (List<NOMWriteElement>) tokenElem) {
-                Token token = new Token(t.getID(), t.getText());
-                sentence.add(token);
+                Token token;
+                if (t.getAttribute(NXTTOKENMISSING) != null && "true".equals(t.getAttribute("missing").getStringValue())) {
+                    token = new MissingToken(t.getID(), t.getText());
+                    sentence.add(token);
+                } else {
+                    token = new Token(t.getID(), t.getText());
+                    sentence.add(token);
+                }
 
                 if (t.findAncestorsNamed(NXTMORPHOLOGY) != null) {
                     for (NOMWriteElement em : (Set<NOMWriteElement>) t.findAncestorsNamed(NXTMORPHOLOGY)) {
@@ -117,6 +128,7 @@ public class NxtCorpusLoader {
             for (NOMWriteElement syn : syntaxElements) {
                 int status;
                 String tag = null;
+                String semantic = null;
                 // load basic information to syntax element
                 if (syn.getAttribute(NXTVALIDITYSTATUS) != null) {
                     if (syn.getAttribute(NXTVALIDITYSTATUS).getStringValue().equals("-1")) {
@@ -136,6 +148,13 @@ public class NxtCorpusLoader {
                 }
 
                 Phrase phrase = new Phrase(corp, syn.getID(), sentence, status, tag);
+                if (syn.getAttribute(NXTSEMANTIC) != null) {
+                    semantic = syn.getAttribute(NXTSEMANTIC).getStringValue();
+                    phrase.setSemantic(semantic);
+                }
+
+
+
                 // load tokens into syntax element
                 for (NOMWriteElement n : (List<NOMWriteElement>) syn.getChildren()) {
                     for (int i = 0; i < sentence.getTokens().size(); i++) {
@@ -183,9 +202,10 @@ public class NxtCorpusLoader {
             }
         }
     }
-   /*
-    * Add informations (set the attributes) about syntax relations to given phrases.
-    */
+    /*
+     * Add informations (set the attributes) about syntax relations to given phrases.
+     */
+
     protected void addSyntaxRelations(Map<String, Phrase> phrases) {
         if (corpus.getElementsByName(NXTSYNTAXRELATION) == null) {
             return;
@@ -208,6 +228,35 @@ public class NxtCorpusLoader {
         }
     }
 
+    protected void addAnaphoras(List<Sentence> sentences) {
+        if (corpus.getElementsByName(NXTANAPHORA) == null) {
+            return;
+        }
+
+        for (NOMWriteElement s : (List<NOMWriteElement>) corpus.getElementsByName(NXTANAPHORA)) {
+            Anaphora an = new Anaphora(s.getID());
+
+
+            Map<String, Phrase> allPhrases = NxtCorpus.getPhrases(sentences);
+            Phrase phraseInRelation = allPhrases.get(((NOMElement) s.getChildren().get(0)).getID());
+            an.setPhrase(phraseInRelation);
+
+            //get Parent Sentence of the token in relation
+            NOMElement tokenParentSentence = s.getPointerWithRole(NXTINRELATIONWITH).getToElement().getParentInFile();
+            Sentence sentence = NxtCorpus.getSentenceById(tokenParentSentence.getID(), sentences);
+            //sentence should be the same as phraseInRelation.getParentSentence(). Dont using phrase's parentSentence for now.
+
+            //find and set the token
+            Token token = sentence.getTokenByID(s.getPointerWithRole(NXTINRELATIONWITH).getToElement().getID());
+            an.setToken(token);
+
+            phraseInRelation.getParentSentence().addAnaphora(an);
+
+
+
+        }
+    }
+
     public boolean isEdited() {
         return corpus.edited();
     }
@@ -222,13 +271,15 @@ public class NxtCorpusLoader {
         List<Sentence> sentences = getSentences(corp);
         Map<String, Phrase> phrases = NxtCorpus.getPhrases(sentences);
         addSyntaxRelations(phrases);
+        addAnaphoras(sentences);
 
         return sentences;
     }
-/*
- * Create and save annotation for given object ID and new status. This method 
- * can be called on each object containing status attribute (dont know what is sanno).
- */
+    /*
+     * Create and save annotation for given object ID and new status. This method 
+     * can be called on each object containing status attribute (dont know what is sanno).
+     */
+
     void createAndSaveAnnotation(String id, String status) throws NOMException {
 
         DateFormat df = new SimpleDateFormat("y/MM/dd HH:mm");
@@ -242,9 +293,10 @@ public class NxtCorpusLoader {
 
         sAnno.addToCorpus();
     }
-/*
- * Check and save the new relation for given phrase ID.
- */
+    /*
+     * Check and save the new relation for given phrase ID.
+     */
+
     public void checkAndSaveRelation(String id, SyntaxRelation relation) {
         NOMElement oldSyntaxRelation = null;
         NOMElement phraseInCorpus = corpus.getElementByID(id);
@@ -329,9 +381,10 @@ public class NxtCorpusLoader {
             }
         }
     }
-/*
- * Checks the annotations for the given sentences.
- */
+    /*
+     * Checks the annotations for the given sentences.
+     */
+
     public List<Annotation> getAnnotations(List<Sentence> sentences) {
         List<Annotation> result = new ArrayList<Annotation>();
         List<NOMWriteElement> lsanno = corpus.getElementsByName("sanno");
@@ -363,8 +416,8 @@ public class NxtCorpusLoader {
                         a.setDate(sanno.getAttribute("date").getStringValue());
                     }
                     /*Works only if there are only annotations for phrases. */
-                    Map<String, Phrase> phrases =NxtCorpus.getPhrases(sentences);
-                    Phrase p =phrases.get(n.getID());
+                    Map<String, Phrase> phrases = NxtCorpus.getPhrases(sentences);
+                    Phrase p = phrases.get(n.getID());
                     a.setContent(p);
                     result.add(a);
 
@@ -374,8 +427,7 @@ public class NxtCorpusLoader {
 
         return result;
     }
-    
-    
+
     /*
      * Check and save the given phrase.
      */
@@ -395,7 +447,7 @@ public class NxtCorpusLoader {
         }
     }
 
-     /*
+    /*
      * Delete object with the given ID
      */
     void deletePhrase(String id) {

@@ -12,7 +12,7 @@
       <token nite:id="ff.text.10">p&#345;ibl&#237;&#382;il</token>
       <token nite:id="ff.text.11">nejsiln&#283;j&#353;&#237;</token>
       <token nite:id="ff.text.12">m&#283;s&#237;c</token>
-      <token nite:id="ff.text.13">co</token>
+      <token nite:id="ff.text.13" missing="true">co</token>
       <token nite:id="ff.text.14">do</token>
       <token nite:id="ff.text.15">vyd&#225;v&#225;n&#237;</token>
       <token nite:id="ff.text.16">anime</token>
