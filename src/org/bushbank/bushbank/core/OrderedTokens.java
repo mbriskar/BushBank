@@ -9,7 +9,7 @@ import java.util.List;
  * @author marx
  */
 public class OrderedTokens {
-    public String id;
+    private String id;
     private List<Token> tokens;
 
     public OrderedTokens(String id) {

@@ -10,7 +10,7 @@ public class Phrase extends OrderedTokens {
     
     private Sentence parentSentence;
     private String grammarTag;
-    private Set<String> semantic;
+    private Set<String> semantic = new HashSet<String>();
     private int status;
     /* @note: is it up-to-date in any case?
      * token numbers according to their position in parent sentence **/
@@ -31,10 +31,25 @@ public class Phrase extends OrderedTokens {
         return semantic;
     }
 
+    /*
+     * Set the semantic attribute. If the attribute was changed, inform corpus.
+     */
     public void setSemantic(Set<String> semantic) {
+        boolean changed=true;
+        if(this.semantic != null) {
+            changed = !this.semantic.equals(semantic);
+        }
         this.semantic = semantic;
+        if (changed) {
+            corpus.updateAttributes(this);
+        }
+        
     }
     
+    /*
+     * Set the semantic attribute. This method is used when reading, so it 
+     * does not inform corpus about the change ( corpus.updateAttributes(this) ).
+     */
     public void setSemantic(String semantic) {
         this.semantic= new HashSet<String>();
         String[] array =semantic.split(",");
@@ -67,8 +82,16 @@ public class Phrase extends OrderedTokens {
     
 
 
+    /*
+     * Add string to the semantic attribute. 
+     * If the attribute was changed, inform corpus.
+     */
    public void addSemantic(String sem) {
-       semantic.add(sem);
+       boolean changed =semantic.add(sem);
+       if (changed) {
+         corpus.updateAttributes(this);
+       }
+      
    }
    public void setCorpus(NxtCorpus corpus) {
         this.corpus = corpus;

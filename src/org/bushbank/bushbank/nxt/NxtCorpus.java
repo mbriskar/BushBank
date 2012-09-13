@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sourceforge.nite.nom.NOMException;
+import org.bushbank.bushbank.core.Anaphora;
 import org.bushbank.bushbank.core.Annotation;
 import org.bushbank.bushbank.core.Phrase;
 import org.bushbank.bushbank.core.Sentence;
@@ -86,7 +87,7 @@ public class NxtCorpus {
         boolean result = false;
         boolean isNew = true;
         // we need to load it again, as the sentences attribute contain phrases which are not saved
-        List<Sentence> loadedSentences = corpusLoader.getSentences(this);
+        List<Sentence> loadedSentences = corpusLoader.loadSentences(this);
         Map<String, Phrase> phrases = getPhrases(loadedSentences);
         List<Phrase> sameSentence = new ArrayList<Phrase>();
 
@@ -105,7 +106,7 @@ public class NxtCorpus {
         }
 
 
-        if (isNew && phrase != null) {
+        if (isNew) {
             try {
                 corpusLoader.savePhrase(phrase);
                 result = true;
@@ -116,6 +117,55 @@ public class NxtCorpus {
 
         return result;
     }
+    
+    
+     public boolean trySaveAnaphora(Anaphora anaphora) {
+        boolean result = false;
+        boolean isNew = true;
+
+        
+        // we need to load it again, as the sentences attribute contain phrases which are not saved
+        List<Sentence> loadedSentences = corpusLoader.loadSentences(this);
+        Sentence anaphoraSentence =null;
+        
+        //get anaphora sentence saved in XML
+        for(int i =0; i<loadedSentences.size(); i++) {
+            if(loadedSentences.get(i).getID().equals(anaphora.getPhrase().getParentSentence().getID())) {
+                anaphoraSentence = loadedSentences.get(i);
+            }
+        }
+        if(anaphoraSentence == null) {
+            return false;
+        }
+        
+        List<Anaphora> savedAnaphoras=anaphoraSentence.getAnaphoras();
+        
+        for(Anaphora a : savedAnaphoras) {
+            if(a.getId().equals(anaphora.getId())) {
+               isNew = false;
+            }
+            
+            if( (a.getPhrase().getTokens().equals(anaphora.getPhrase().getTokens())) && 
+                    (a.getToken().equals(anaphora.getToken()) ) )  {
+                //anaphora with same token and phrase is already there
+                isNew = false;
+            }
+        }
+        
+        if (isNew) {
+            try {
+                corpusLoader.saveAnaphora(anaphora);
+                result = true;
+            } catch (NOMException ex) {
+                Logger.getLogger(NxtCorpus.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        return result;
+        
+      
+         
+     }
 
     /**
      * Get all the phrases which are in the given sentences.
@@ -180,5 +230,15 @@ public class NxtCorpus {
      */
     public void updateSetInRelationWith(String id, SyntaxRelation parent) {
         corpusLoader.checkAndSaveRelation(id, parent);
+    }
+     /**
+     * Called only from phrase, when it changes its attribute. 
+     */
+    public void updateAttributes(Phrase phrase) {
+        try {
+            corpusLoader.updateAttributes(phrase);
+        } catch (NOMException ex) {
+            Logger.getLogger(NxtCorpus.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

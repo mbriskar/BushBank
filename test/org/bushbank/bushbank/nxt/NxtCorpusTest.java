@@ -1,9 +1,11 @@
 package org.bushbank.bushbank.nxt;
 
+import java.util.HashSet;
 import org.bushbank.bushbank.core.ValidityStatus;
 import org.bushbank.bushbank.core.Phrase;
 import org.bushbank.bushbank.core.Sentence;
 import java.util.List;
+import java.util.Set;
 import net.sourceforge.nite.nom.nomwrite.NOMElement;
 import org.bushbank.bushbank.core.Anaphora;
 import org.bushbank.bushbank.core.Annotation;
@@ -131,7 +133,7 @@ public class NxtCorpusTest {
     public void testGetSentence_Annaphoras() throws NxtException  {
          loadSimpleFull();
          List<Anaphora> anaphoras =sentences.get(0).getAnaphoras();
-         
+         assertEquals(1,anaphoras.size());
          for(Anaphora anaphora : anaphoras) {
              if("ff.anaphora.1".equals(anaphora.getId())) {
                  assertEquals("ff.text.6", anaphora.getToken().getID());
@@ -232,7 +234,7 @@ public class NxtCorpusTest {
         assertEquals("Testing", p1.getGrammarTag());
 
 
-        corpus.getCorpusLoader().deletePhrase(p1.getID());
+        corpus.getCorpusLoader().deleteObject(p1.getID());
         corpus.save();
 
         loadDynamicFull();
@@ -292,5 +294,88 @@ public class NxtCorpusTest {
         assertEquals(relationp0.getParentElement().getID(), p0.getInRelationWith().getParentElement().getID());
         assertEquals(relationp1.getParentElement().getID(), p1.getInRelationWith().getParentElement().getID());
         assertEquals(relationp2.getParentElement().getID(), p2.getInRelationWith().getParentElement().getID());
+    }
+    
+    @Test
+    public void testPhraseAttribute_semantic() throws NxtException, InterruptedException {
+        loadDynamicFull();
+        String stringToAdd = "newabc";
+        Phrase p0 = sentences.get(0).getPhraseById("ff.syntax.1");
+        
+        Set<String> oldSemanticSet = new HashSet<String>();
+        Set<String> newSemanticSet = new HashSet<String>();
+        for(String s : p0.getSemantic()) {
+            oldSemanticSet.add(s);
+            newSemanticSet.add(s);
+        }
+        
+        newSemanticSet.add(stringToAdd);
+        p0.addSemantic(stringToAdd);
+        
+        corpus.save();
+        loadDynamicFull();
+        
+        p0 = sentences.get(0).getPhraseById("ff.syntax.1");
+        assertEquals(newSemanticSet,p0.getSemantic());
+        p0.setSemantic(oldSemanticSet);
+      
+        corpus.save();
+        loadDynamicFull();
+        p0 = sentences.get(0).getPhraseById("ff.syntax.1");
+        if(oldSemanticSet.isEmpty()) {
+            assertTrue(p0.getSemantic().isEmpty());
+        }else {
+            assertEquals(oldSemanticSet,p0.getSemantic());
+        }
+        
+        
+        
+    }
+
+    @Test
+    public void testSaveAnaphora() throws NxtException, InterruptedException {
+        loadDynamicFull();
+        int anaphorasNumber = sentences.get(0).getAnaphoras().size();
+        Anaphora a0 = sentences.get(0).getAnaphoraById("ff.anaphora.1");
+        Anaphora likeA0 = new Anaphora("new_Anaphora");
+        Anaphora uniqueNew = new Anaphora("new_Anaphora2");
+
+        likeA0.setPhrase(sentences.get(0).getPhraseById("ff.syntax.4"));
+        likeA0.setToken(sentences.get(0).getTokenByID("ff.text.6"));
+
+        uniqueNew.setPhrase(sentences.get(0).getPhraseById("ff.syntax.1"));
+        uniqueNew.setToken(sentences.get(0).getTokenByID("ff.text.2"));
+
+        assertFalse(corpus.trySaveAnaphora(a0));
+        assertFalse(corpus.trySaveAnaphora(likeA0));
+        assertTrue(corpus.trySaveAnaphora(uniqueNew));
+ 
+        corpus.save();
+        loadDynamicFull();
+        //check if it was saved
+        Anaphora savedUniqueAnaphora = null;
+        for( Anaphora anaph : sentences.get(0).getAnaphoras() ) {
+            if ((anaph.getPhrase().getID().equals(uniqueNew.getPhrase().getID())) &&
+                    (anaph.getToken().getID().equals(uniqueNew.getToken().getID()))) {
+                savedUniqueAnaphora = anaph;
+            }
+        }
+
+
+        assertNotNull(savedUniqueAnaphora);
+        assertFalse(corpus.trySaveAnaphora(uniqueNew));
+
+        corpus.getCorpusLoader().deleteObject(savedUniqueAnaphora.getId());
+        corpus.save();
+
+        loadDynamicFull();
+        savedUniqueAnaphora = null;
+        for( Anaphora anaph : sentences.get(0).getAnaphoras() ) {
+            if ((anaph.getPhrase().getID().equals(uniqueNew.getPhrase().getID())) &&
+                    (anaph.getToken().getID().equals(uniqueNew.getToken().getID()))) {
+                savedUniqueAnaphora = anaph;
+            }
+        }
+        assertNull(savedUniqueAnaphora);
     }
 }

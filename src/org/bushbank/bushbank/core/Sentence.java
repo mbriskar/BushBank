@@ -51,6 +51,15 @@ public class Sentence extends OrderedTokens {
         }
         return null;
     }
+    
+    public Anaphora getAnaphoraById(String id) {
+        for (Anaphora a : anaphoras) {
+            if(a.getId().equals(id)) {
+                return a;
+            }
+        }
+        return null;
+    }
 
     public boolean removePhrase(Phrase phrase) { return phrases.remove(phrase); }
     public List<Phrase> getPhrases() { return Collections.unmodifiableList(phrases); }

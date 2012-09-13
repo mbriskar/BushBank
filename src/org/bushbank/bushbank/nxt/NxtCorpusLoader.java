@@ -435,7 +435,7 @@ public class NxtCorpusLoader {
         if (corpus.getElementByID(phrase.getID()) == null) {
             System.out.println("NEW " + phrase);
             NOMWriteElement pElem = new NOMWriteAnnotation(corpus, "syntax", observation, "");
-            NOMWriteElement sElem = (NOMWriteElement) corpus.getElementByID(phrase.getParentSentence().getID());
+
 
             pElem.addAttribute(new NOMWriteAttribute("tag", phrase.getGrammarTag()));
             pElem.addAttribute(new NOMWriteAttribute("status", String.valueOf(phrase.getValidityStatus())));
@@ -450,7 +450,7 @@ public class NxtCorpusLoader {
     /*
      * Delete object with the given ID
      */
-    void deletePhrase(String id) {
+    void deleteObject(String id) {
         NOMElement pElem = corpus.getElementByID(id);
         if (pElem != null) {
             NOMElement parentElem = pElem.getParentInFile();
@@ -460,5 +460,43 @@ public class NxtCorpusLoader {
                 Logger.getLogger(NxtCorpus.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+
+    void saveAnaphora(Anaphora anaphora) throws NOMException {
+         if (corpus.getElementByID(anaphora.getId()) == null) {
+            System.out.println("NEW " + anaphora);
+            NOMWriteElement pElem = new NOMWriteAnnotation(corpus, "anaphora", observation, "");
+            pElem.addChild(corpus.getElementByID(anaphora.getPhrase().getID()));
+            pElem.addPointer(new NOMWritePointer(corpus, "in-relation-with", null, corpus.getElementByID(anaphora.getToken().getID())));
+            pElem.addToCorpus();
+        }
+    }
+
+    // checks only semantic attribute
+    void updateAttributes(Phrase phrase) throws NOMException {
+        if (corpus.getElementByID(phrase.getID()) != null) {
+            NOMElement el = corpus.getElementByID(phrase.getID());
+           
+            
+            String newSemantic = "";
+            for(String s :  phrase.getSemantic() ) {
+                if(!newSemantic.equals("")) {
+                    s="," +s;
+                }
+                newSemantic=newSemantic + s;
+            }
+            if(newSemantic.equals("")) {
+                el.removeAttribute("semantic");
+            } else {
+                  el.setStringAttribute("semantic", newSemantic);
+            }
+          
+
+        }
+    }
+    
+    //not needed for now
+    void updateAttributes(Anaphora anaphora) {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 }
