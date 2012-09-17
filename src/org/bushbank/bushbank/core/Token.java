@@ -1,5 +1,7 @@
 package org.bushbank.bushbank.core;
 
+import java.io.Serializable;
+
 /** Class that holds information information for token
  *
  *  Token is created from source after 'tokenization'. Tokenization
@@ -8,7 +10,7 @@ package org.bushbank.bushbank.core;
  *  not have any specific condition for tokens and what they can/cant
  *  contain. 
  */
-public class Token{
+public class Token implements Serializable{
     
     private Morphology morphology;
     private String id;

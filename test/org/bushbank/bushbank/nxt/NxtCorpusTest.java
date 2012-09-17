@@ -378,4 +378,91 @@ public class NxtCorpusTest {
         }
         assertNull(savedUniqueAnaphora);
     }
+    
+     @Test
+    public void testSaveAnaphoraWithMissingToken() throws NxtException, InterruptedException {
+        loadDynamicFull();
+        int anaphorasNumber = sentences.get(0).getAnaphoras().size();
+        Anaphora a0 = sentences.get(0).getAnaphoraById("ff.anaphora.1");
+        Anaphora uniqueNew = new Anaphora("new_Anaphora2");
+
+        uniqueNew.setPhrase(sentences.get(0).getPhraseById("ff.syntax.1"));
+        uniqueNew.setToken(new MissingToken("token","token"));
+
+        assertTrue(corpus.trySaveAnaphoraWithUnsavedMissingToken(uniqueNew, sentences.get(0)));
+ 
+        corpus.save();
+        loadDynamicFull();
+        //check if it was saved
+        Anaphora savedUniqueAnaphora = null;
+        for( Anaphora anaph : sentences.get(0).getAnaphoras() ) {
+            if ((anaph.getPhrase().getID().equals(uniqueNew.getPhrase().getID())) &&
+                    (anaph.getToken().getWordForm().equals(uniqueNew.getToken().getWordForm())) &&
+                        (anaph.getToken() instanceof MissingToken)) {
+                savedUniqueAnaphora = anaph;
+            }
+        }
+
+
+        assertNotNull(savedUniqueAnaphora);
+        assertFalse(corpus.trySaveAnaphora(uniqueNew));
+
+        corpus.getCorpusLoader().deleteObject(savedUniqueAnaphora.getId());
+        corpus.getCorpusLoader().deleteObject(savedUniqueAnaphora.getToken().getID());
+        corpus.save();
+
+        loadDynamicFull();
+        savedUniqueAnaphora = null;
+        for( Anaphora anaph : sentences.get(0).getAnaphoras() ) {
+            if ((anaph.getPhrase().getID().equals(uniqueNew.getPhrase().getID())) &&
+                    (anaph.getToken().getWordForm().equals(uniqueNew.getToken().getWordForm())) &&
+                        (anaph.getToken() instanceof MissingToken)) {
+                savedUniqueAnaphora = anaph;
+            }
+        }
+        assertNull(savedUniqueAnaphora);
+    }
+    
+     @Test
+    public void testMissingToken() throws NxtException, InterruptedException {
+        loadDynamicFull();
+        int tokenNumber = sentences.get(0).getTokens().size();
+        Token t0 = sentences.get(0).getTokenByID("ff.text.2");
+        MissingToken t = new MissingToken("a", "word");
+
+        
+
+        assertTrue(corpus.trySaveMissingToken(t,sentences.get(0)));
+ 
+        corpus.save();
+        loadDynamicFull();
+        //check if it was saved
+        Anaphora savedUniqueAnaphora = null;
+        int tokenNumber2 = sentences.get(0).getTokens().size();
+        assertEquals(tokenNumber +1, tokenNumber2);
+        Token savedToken = null;
+        for( Token token : sentences.get(0).getTokens() ) {
+            if(("word".equals(token.getWordForm())) && (token instanceof MissingToken) ){
+                savedToken = token;
+            }
+        }
+
+
+        assertNotNull(savedToken);
+
+        corpus.getCorpusLoader().deleteObject(savedToken.getID());
+        corpus.save();
+
+        loadDynamicFull();
+        savedUniqueAnaphora = null;
+        savedToken = null;
+        for( Token token : sentences.get(0).getTokens() ) {
+            if(("word".equals(token.getWordForm())) && (token instanceof MissingToken) ){
+                savedToken = token;
+            }
+        }
+
+
+        assertNull(savedToken);
+    }
 }

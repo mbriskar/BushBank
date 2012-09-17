@@ -63,4 +63,15 @@ public class Sentence extends OrderedTokens {
 
     public boolean removePhrase(Phrase phrase) { return phrases.remove(phrase); }
     public List<Phrase> getPhrases() { return Collections.unmodifiableList(phrases); }
+    
+    public String toString() {
+        String res = new String();
+        for (Token x : this.getTokens()) {
+            if (!(x instanceof MissingToken)) {
+                 res += x.getWordForm() + " ";
+            }
+           
+        }
+        return res;
+    }
 }

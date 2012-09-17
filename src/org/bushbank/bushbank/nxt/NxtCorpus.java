@@ -12,9 +12,11 @@ import java.util.logging.Logger;
 import net.sourceforge.nite.nom.NOMException;
 import org.bushbank.bushbank.core.Anaphora;
 import org.bushbank.bushbank.core.Annotation;
+import org.bushbank.bushbank.core.MissingToken;
 import org.bushbank.bushbank.core.Phrase;
 import org.bushbank.bushbank.core.Sentence;
 import org.bushbank.bushbank.core.SyntaxRelation;
+import org.bushbank.bushbank.core.Token;
 
 
 public class NxtCorpus {
@@ -56,6 +58,10 @@ public class NxtCorpus {
     public NxtCorpusLoader getCorpusLoader() {
         return corpusLoader;
     }
+    
+    public Sentence getSentence(int position) {
+       return sentences.get(position);
+    }
 
     /**
      * Load annotations for sentences. If sentences were not loaded, they will
@@ -76,6 +82,7 @@ public class NxtCorpus {
 
 
     }
+
 
     /**
      * Tries to save a new created Phrase to file.
@@ -132,6 +139,7 @@ public class NxtCorpus {
         for(int i =0; i<loadedSentences.size(); i++) {
             if(loadedSentences.get(i).getID().equals(anaphora.getPhrase().getParentSentence().getID())) {
                 anaphoraSentence = loadedSentences.get(i);
+                break;
             }
         }
         if(anaphoraSentence == null) {
@@ -240,5 +248,38 @@ public class NxtCorpus {
         } catch (NOMException ex) {
             Logger.getLogger(NxtCorpus.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public boolean trySaveAnaphoraWithUnsavedMissingToken(Anaphora anaphora,Sentence parentSentence) {
+        MissingToken t = (MissingToken)anaphora.getToken();
+        // we need to get saved ID of the missing TOKEN
+        if (trySaveMissingToken(t, parentSentence)) {
+            sentences = corpusLoader.loadSentences(this);
+            Sentence newParentSentence =null;
+            for (Sentence s : sentences) {
+                if(s.getID().equals(parentSentence.getID())) {
+                    newParentSentence=s;
+                }
+            }
+            for(Token tok : newParentSentence.getTokens()) {
+                if(((tok.getWordForm().equals(anaphora.getToken().getWordForm()))) && (tok instanceof MissingToken )) {
+                anaphora.setToken(tok);
+                
+                return trySaveAnaphora(anaphora);
+            }
+            }
+        }
+        return false;
+        
+    }
+    
+    public boolean trySaveMissingToken(MissingToken token,Sentence parentSentence) {
+        try {
+            corpusLoader.saveMissingToken(token,parentSentence);
+        } catch (NOMException ex) {
+            Logger.getLogger(NxtCorpus.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+        return true;
     }
 }

@@ -499,4 +499,15 @@ public class NxtCorpusLoader {
     void updateAttributes(Anaphora anaphora) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
+
+    void saveMissingToken(MissingToken token, Sentence parentSentence) throws NOMException {
+        NOMElement sentenceElem = corpus.getElementByID(parentSentence.getID());
+
+       
+        NOMWriteElement tElem = new NOMWriteAnnotation(corpus, "token", observation, "");
+        tElem.appendText(token.getWordForm());
+        tElem.addAttribute(new NOMWriteAttribute("missing", "true"));
+        sentenceElem.addChild(tElem);
+            
+    }
 }
