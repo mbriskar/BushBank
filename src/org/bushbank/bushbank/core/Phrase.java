@@ -121,4 +121,11 @@ public class Phrase extends OrderedTokens {
     public Sentence getParentSentence() { return parentSentence; }
 
     public SyntaxRelation getInRelationWith() { return this.parentPhrase; }
+
+    public void removeSemantic(String semanticAttribute) {
+        boolean changed =semantic.remove(semanticAttribute);
+        if (changed) {
+         corpus.updateAttributes(this);
+       }
+    }
 }

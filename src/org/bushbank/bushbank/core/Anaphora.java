@@ -43,6 +43,10 @@ public class Anaphora {
     public void setPhrase(Phrase phrase) {
         this.phrase = phrase;
     }
+
+    public void setId(String id) {
+        this.id=id;
+    }
   
     
 }
