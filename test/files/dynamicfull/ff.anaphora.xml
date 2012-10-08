@@ -2,6 +2,6 @@
 <nite:stream nite:id="ff.anaphora" xmlns:nite="http://nite.sourceforge.net/">
    <anaphora nite:id="ff.anaphora.1">
       <nite:pointer role="in-relation-with"  href="ff.text.xml#id(ff.text.6)"/>
-      <nite:child href="ff.syntax.xml#id(ff.syntax.4)"/>
+      <nite:child href="ff.text.xml#id(ff.text.4)"/>
    </anaphora>
 </nite:stream>

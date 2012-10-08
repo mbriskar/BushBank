@@ -235,25 +235,19 @@ public class NxtCorpusLoader {
 
         for (NOMWriteElement s : (List<NOMWriteElement>) corpus.getElementsByName(NXTANAPHORA)) {
             Anaphora an = new Anaphora(s.getID());
+            NOMElement pointerParentSentence = ((NOMElement)s.getChildren().get(0)).getParentInFile();
+            NOMElement targetParentSentence = s.getPointerWithRole(NXTINRELATIONWITH).getToElement().getParentInFile();
+            Sentence pointerSentence = NxtCorpus.getSentenceById(pointerParentSentence.getID(), sentences);
+            Sentence targetSentence = NxtCorpus.getSentenceById(targetParentSentence.getID(), sentences);
+           
+            Token pointerToken = pointerSentence.getTokenByID(((NOMElement) s.getChildren().get(0)).getID());
+            an.setPointer(pointerToken);
 
+            
+            Token targetToken = targetSentence.getTokenByID(s.getPointerWithRole(NXTINRELATIONWITH).getToElement().getID());
+            an.setTarget(targetToken);
 
-            Map<String, Phrase> allPhrases = NxtCorpus.getPhrases(sentences);
-            Phrase phraseInRelation = allPhrases.get(((NOMElement) s.getChildren().get(0)).getID());
-            an.setPhrase(phraseInRelation);
-
-            //get Parent Sentence of the token in relation
-            NOMElement tokenParentSentence = s.getPointerWithRole(NXTINRELATIONWITH).getToElement().getParentInFile();
-            Sentence sentence = NxtCorpus.getSentenceById(tokenParentSentence.getID(), sentences);
-            //sentence should be the same as phraseInRelation.getParentSentence(). Dont using phrase's parentSentence for now.
-
-            //find and set the token
-            Token token = sentence.getTokenByID(s.getPointerWithRole(NXTINRELATIONWITH).getToElement().getID());
-            an.setToken(token);
-
-            phraseInRelation.getParentSentence().addAnaphora(an);
-
-
-
+            pointerSentence.addAnaphora(an);
         }
     }
 
@@ -466,8 +460,8 @@ public class NxtCorpusLoader {
          if (corpus.getElementByID(anaphora.getId()) == null) {
             System.out.println("NEW " + anaphora);
             NOMWriteElement pElem = new NOMWriteAnnotation(corpus, "anaphora", observation, "");
-            pElem.addChild(corpus.getElementByID(anaphora.getPhrase().getID()));
-            pElem.addPointer(new NOMWritePointer(corpus, "in-relation-with", null, corpus.getElementByID(anaphora.getToken().getID())));
+            pElem.addChild(corpus.getElementByID(anaphora.getPointer().getID()));
+            pElem.addPointer(new NOMWritePointer(corpus, "in-relation-with", null, corpus.getElementByID(anaphora.getTarget().getID())));
             pElem.addToCorpus();
         }
     }

@@ -74,7 +74,7 @@
                 </structural-layer>
             </coding-file>
             <coding-file name="anaphora">
-                <structural-layer name="anaphora-layer" recursive-draws-children-from="syntax-layer">
+                <structural-layer name="anaphora-layer" recursive-draws-children-from="token-layer">
                      <code name="anaphora">
                         <attribute name="type" value-type="string"/>
                         <pointer number="1" role="in-relation-with" target="token-layer"/>

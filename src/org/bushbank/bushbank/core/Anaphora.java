@@ -10,39 +10,41 @@ package org.bushbank.bushbank.core;
  */
 public class Anaphora {
     
-    private Token token;
-    private Phrase phrase;
+    private Token pointer;
+    private Token target;
     private String id;
     
     public Anaphora (String id) {
         this.id=id;
     }
     
-      public Anaphora(String id,Token token, Phrase phrase) {
+      public Anaphora(String id,Token token, Token target) {
         this(id);
-        this.token=token;
-        this.phrase=phrase;
+        this.pointer=token;
+        this.target=target;
     }
 
-    public Token getToken() {
-        return token;
+    public void setPointer(Token pointer) {
+        this.pointer = pointer;
+    }
+
+    public Token getTarget() {
+        return target;
+    }
+
+    public void setTarget(Token target) {
+        this.target = target;
+    }
+
+    public Token getPointer() {
+        return pointer;
     }
 
     public String getId() {
         return id;
     }
 
-    public void setToken(Token token) {
-        this.token = token;
-    }
-
-    public Phrase getPhrase() {
-        return phrase;
-    }
-
-    public void setPhrase(Phrase phrase) {
-        this.phrase = phrase;
-    }
+ 
 
     public void setId(String id) {
         this.id=id;

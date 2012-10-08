@@ -18,6 +18,15 @@ public class OrderedTokens {
     }
 
     public List<Token> getTokens() { return Collections.unmodifiableList(tokens); }
+    public List<Token> getNotMissingTokens() {
+        List<Token> result = new ArrayList<Token>();
+        for (Token t:tokens) {
+            if(!(t instanceof MissingToken)) {
+                result.add(t);
+            }
+        }
+        return result;
+    }
     public String getID() { return id; }
 
     public void add(Token t) {

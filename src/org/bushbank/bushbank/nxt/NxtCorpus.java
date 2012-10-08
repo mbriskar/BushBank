@@ -121,22 +121,25 @@ public class NxtCorpus {
 
         return result;
     }
-
+    
     public boolean trySaveAnaphora(Anaphora anaphora) {
         boolean saved = false;
         boolean isNew = true;
 
         // we need to load it again, as the sentences attribute contain phrases which are not saved
+        // it may be irrelevant
         List<Sentence> loadedSentences = corpusLoader.loadSentences(this);
         Sentence anaphoraSentence = null;
-
-        //get anaphora sentence saved in XML
-        for (int i = 0; i < loadedSentences.size(); i++) {
-            if (loadedSentences.get(i).getID().equals(anaphora.getPhrase().getParentSentence().getID())) {
-                anaphoraSentence = loadedSentences.get(i);
-                break;
+        
+        for (Sentence s : loadedSentences) {
+            for(Token t:s.getTokens()) {
+                if(t.getID().equals(anaphora.getPointer().getID())) {
+                    anaphoraSentence = s;
+                    break;
+                }
             }
         }
+
         if (anaphoraSentence == null) {
             return false;
         }
@@ -148,8 +151,8 @@ public class NxtCorpus {
                 isNew = false;
             }
 
-            if ((a.getPhrase().getTokens().equals(anaphora.getPhrase().getTokens()))
-                    && (a.getToken().equals(anaphora.getToken()))) {
+            if ((a.getPointer().equals(anaphora.getPointer()))
+                    && (a.getTarget().equals(anaphora.getTarget()))) {
                 //anaphora with same token and phrase is already there
                 isNew = false;
             }
@@ -177,14 +180,15 @@ public class NxtCorpus {
     private String updateAnaphoraId(Anaphora anaphora) {
         List<Sentence> sentences = corpusLoader.loadSentences(this);
         for (Sentence s : sentences) {
-            if (anaphora.getPhrase().getParentSentence().getID().equals(s.getID())) {
+            for(Token t : s.getTokens()) {
+             if (anaphora.getPointer().getID().equals(t.getID())) {
                 for (Anaphora a : s.getAnaphoras()) {
-                    if ((a.getPhrase().getID().equals(anaphora.getPhrase().getID())) && (a.getToken().getID().equals(anaphora.getToken().getID()))) {
+                    if ((a.getPointer().getID().equals(anaphora.getPointer().getID())) && (a.getTarget().getID().equals(anaphora.getTarget().getID()))) {
                         anaphora.setId(a.getId());
                         return a.getId();
                     }
                 }
-            }
+            }}
         }
         return null;
     }
@@ -202,6 +206,18 @@ public class NxtCorpus {
         }
 
         return phrases;
+    }
+    
+     public static Map<String, Token> getTokens(List<Sentence> sentences) {
+        Map<String, Token> tokens = new HashMap<String, Token>();
+
+        for (Sentence s : sentences) {
+            for (Token t : s.getTokens()) {
+                tokens.put(t.getID(), t);
+            }
+        }
+
+        return tokens;
     }
 
     public static Sentence getSentenceById(String id, List<Sentence> sentences) {
@@ -264,7 +280,7 @@ public class NxtCorpus {
             Logger.getLogger(NxtCorpus.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+/*
     public boolean trySaveAnaphoraWithUnsavedMissingToken(Anaphora anaphora, Sentence parentSentence) {
         MissingToken t = (MissingToken) anaphora.getToken();
         boolean saved = false;
@@ -291,7 +307,7 @@ public class NxtCorpus {
         return saved;
 
     }
-
+*/
     public boolean trySaveMissingToken(MissingToken token, Sentence parentSentence) {
         try {
             corpusLoader.saveMissingToken(token, parentSentence);
