@@ -432,7 +432,7 @@ public class NxtCorpusTest {
 
         
 
-        assertTrue(corpus.trySaveMissingToken(t,sentences.get(0)));
+        assertNotNull(corpus.trySaveMissingToken(t,sentences.get(0)));
  
         corpus.save();
         loadDynamicFull();
