@@ -283,7 +283,7 @@ public class NxtCorpus {
     }
 
     /*
-     * Save and return new MissingToken. It finds it always as the last token in the sentence.
+     * Save missing token at the end of the sentence and return new MissingToken. It finds it always as the last token in the sentence.
      */
     public MissingToken trySaveMissingToken(MissingToken token, Sentence parentSentence) {
         try {
@@ -307,4 +307,37 @@ public class NxtCorpus {
         return null;
 
     }
+
+    /*
+     * Save missing token before the given token of the sentence and return new MissingToken. It finds it always as the before the given token in the sentence.
+     */
+    public MissingToken trySaveMissingTokenBeforeToken(MissingToken mt, Token tokenAfter, Sentence parentSentence) {
+        try {
+            corpusLoader.saveMissingTokenBeforeToken(mt,tokenAfter, parentSentence);
+        } catch (NOMException ex) {
+            Logger.getLogger(NxtCorpus.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+
+        List<Sentence> loadedSentences = corpusLoader.loadSentences(this);
+        Sentence newParentSentence = null;
+        for (Sentence s : loadedSentences) {
+            if (s.getID().equals(parentSentence.getID())) {
+                newParentSentence = s;
+            }
+        }
+        for(int i=0;i<newParentSentence.getTokens().size();i++) {
+            if(newParentSentence.getTokens().get(i+1).getID().equals(tokenAfter.getID())) {
+                Token tokenBefore = newParentSentence.getTokens().get(i);
+                if((((tokenBefore.getWordForm().equals(mt.getWordForm()))) && (tokenBefore instanceof MissingToken))) {
+                    return (MissingToken)tokenBefore;
+                }
+            }
+        }
+        return null;
+    }
+
+   
+
+
 }

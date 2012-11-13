@@ -85,4 +85,12 @@ public class Token implements Serializable{
     public void setWordForm(String wordForm) {
         this.wordForm = wordForm;
     }
+    
+    public boolean equals(Token b) {
+        if(b==null) {
+            return false;
+        }
+        return getID().equals(b.getID());
+        
+    }
 }

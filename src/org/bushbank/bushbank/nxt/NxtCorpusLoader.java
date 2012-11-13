@@ -504,4 +504,14 @@ public class NxtCorpusLoader {
         sentenceElem.addChild(tElem);
             
     }
+
+    void saveMissingTokenBeforeToken(MissingToken mt, Token tokenAfter, Sentence parentSentence) throws NOMException {
+         NOMElement sentenceElem = corpus.getElementByID(parentSentence.getID());
+         NOMElement afterElem =corpus.getElementByID(tokenAfter.getID());
+       
+        NOMWriteElement tElem = new NOMWriteAnnotation(corpus, "token", observation, "");
+        tElem.appendText(mt.getWordForm());
+        tElem.addAttribute(new NOMWriteAttribute("missing", "true"));
+        sentenceElem.addChildBefore(afterElem, tElem);
+    }
 }

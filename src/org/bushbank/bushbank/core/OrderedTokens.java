@@ -18,6 +18,11 @@ public class OrderedTokens {
     }
 
     public List<Token> getTokens() { return Collections.unmodifiableList(tokens); }
+    
+    public void add(int index, Token t) {
+        if (t == null) {throw new NullPointerException();}
+        tokens.add(index,t);
+    }
     public List<Token> getNotMissingTokens() {
         List<Token> result = new ArrayList<Token>();
         for (Token t:tokens) {
