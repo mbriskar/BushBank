@@ -59,6 +59,9 @@ public class NxtCorpus {
     }
 
     public Sentence getSentence(int position) {
+        if (sentences == null) {
+            sentences = corpusLoader.loadSentences(this);
+        }
         return sentences.get(position);
     }
 
